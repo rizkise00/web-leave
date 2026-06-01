@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Web Cuti</title>
+    <title>Daftar - Web Cuti</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         .bg-login {
@@ -46,8 +46,6 @@
          style="top:40%; left:-120px;"></div>
     <div class="blob w-56 h-56 bg-accent animate-float-alt"
          style="top:10%; right:5%;"></div>
-    <div class="blob w-40 h-40 bg-primary-light animate-float"
-         style="bottom:15%; left:10%; opacity:0.15;"></div>
 
     {{-- Decorative grid overlay --}}
     <div class="absolute inset-0 pointer-events-none"
@@ -79,12 +77,12 @@
                 <p class="text-accent font-semibold mt-1 text-sm">Sistem Manajemen Cuti</p>
             </div>
 
-            {{-- Features list --}}
+            {{-- Info list --}}
             <div class="space-y-4">
                 @foreach([
-                    ['icon'=>'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2', 'text'=>'Pengajuan cuti mudah & cepat'],
-                    ['icon'=>'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', 'text'=>'Persetujuan real-time'],
-                    ['icon'=>'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', 'text'=>'Laporan & statistik lengkap'],
+                    ['icon'=>'M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z', 'text'=>'Daftar akun baru dengan mudah'],
+                    ['icon'=>'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', 'text'=>'Akun diverifikasi oleh manajer'],
+                    ['icon'=>'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2', 'text'=>'Ajukan cuti setelah akun disetujui'],
                 ] as $item)
                     <div class="flex items-center gap-3">
                         <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
@@ -104,8 +102,8 @@
         {{-- Right panel - form --}}
         <div class="card-glass flex-1 flex flex-col justify-center px-8 py-10 sm:px-12">
 
-            {{-- Mobile brand (only on small screens) --}}
-            <div class="lg:hidden text-center mb-8">
+            {{-- Mobile brand --}}
+            <div class="lg:hidden text-center mb-6">
                 <div class="inline-flex items-center justify-center w-14 h-14 bg-accent rounded-2xl shadow-lg mb-3">
                     <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -115,38 +113,14 @@
                 <h1 class="text-2xl font-extrabold text-primary">Web Cuti</h1>
             </div>
 
-            <div class="mb-7">
-                <h2 class="text-2xl font-extrabold text-primary">Selamat Datang</h2>
-                <p class="text-gray-500 text-sm mt-1">Masuk untuk melanjutkan ke dashboard Anda</p>
+            <div class="mb-6">
+                <h2 class="text-2xl font-extrabold text-primary">Buat Akun Baru</h2>
+                <p class="text-gray-500 text-sm mt-1">Daftarkan diri Anda &mdash; akun akan diaktifkan setelah persetujuan manajer</p>
             </div>
-
-            {{-- Register success alert --}}
-            @if (session('register_success'))
-                <div class="mb-5 bg-green-50 border border-green-200 text-green-700 rounded-xl px-4 py-3 flex items-start gap-3">
-                    <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                            clip-rule="evenodd"/>
-                    </svg>
-                    <p class="text-sm">{{ session('register_success') }}</p>
-                </div>
-            @endif
-
-            {{-- Account pending/rejected alert --}}
-            @if (session('account_status_error'))
-                <div class="mb-5 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-xl px-4 py-3 flex items-start gap-3">
-                    <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd"
-                            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                            clip-rule="evenodd"/>
-                    </svg>
-                    <p class="text-sm">{{ session('account_status_error') }}</p>
-                </div>
-            @endif
 
             {{-- Error alert --}}
             @if ($errors->any())
-                <div class="mb-5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 flex items-start gap-3">
+                <div class="mb-4 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 flex items-start gap-3">
                     <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd"
                             d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
@@ -160,29 +134,43 @@
                 </div>
             @endif
 
-            <form action="{{ route('login') }}" method="POST" class="space-y-5">
+            <form action="{{ route('register.post') }}" method="POST" class="space-y-4" id="formRegister">
                 @csrf
+
+                {{-- Name --}}
+                <div>
+                    <label for="name" class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">
+                        Nama Lengkap <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                        </span>
+                        <input type="text" id="name" name="name" value="{{ old('name') }}"
+                            placeholder="Nama lengkap Anda" required autofocus
+                            class="w-full pl-10 pr-4 py-3 border-2 rounded-xl text-sm text-gray-800 placeholder-gray-400
+                                focus:ring-0 focus:border-primary transition-colors duration-200
+                                {{ $errors->has('name') ? 'border-red-400 bg-red-50' : 'border-gray-200 bg-gray-50 hover:border-gray-300 focus:bg-white' }}">
+                    </div>
+                </div>
 
                 {{-- Email --}}
                 <div>
                     <label for="email" class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">
-                        Alamat Email
+                        Alamat Email <span class="text-red-500">*</span>
                     </label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                            <svg class="w-4.5 h-4.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                             </svg>
                         </span>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value="{{ old('email') }}"
-                            placeholder="nama@perusahaan.com"
-                            required
-                            autofocus
+                        <input type="email" id="email" name="email" value="{{ old('email') }}"
+                            placeholder="nama@perusahaan.com" required
                             class="w-full pl-10 pr-4 py-3 border-2 rounded-xl text-sm text-gray-800 placeholder-gray-400
                                 focus:ring-0 focus:border-primary transition-colors duration-200
                                 {{ $errors->has('email') ? 'border-red-400 bg-red-50' : 'border-gray-200 bg-gray-50 hover:border-gray-300 focus:bg-white' }}">
@@ -192,24 +180,20 @@
                 {{-- Password --}}
                 <div>
                     <label for="password" class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">
-                        Kata Sandi
+                        Kata Sandi <span class="text-red-500">*</span>
                     </label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                            <svg class="w-4.5 h-4.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                             </svg>
                         </span>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            placeholder="••••••••"
-                            required
-                            class="w-full pl-10 pr-11 py-3 border-2 border-gray-200 bg-gray-50 hover:border-gray-300 focus:bg-white
-                                rounded-xl text-sm text-gray-800 placeholder-gray-400
-                                focus:ring-0 focus:border-primary transition-colors duration-200">
+                        <input type="password" id="password" name="password"
+                            placeholder="Min. 6 karakter" required
+                            class="w-full pl-10 pr-11 py-3 border-2 rounded-xl text-sm text-gray-800 placeholder-gray-400
+                                focus:ring-0 focus:border-primary transition-colors duration-200
+                                {{ $errors->has('password') ? 'border-red-400 bg-red-50' : 'border-gray-200 bg-gray-50 hover:border-gray-300 focus:bg-white' }}">
                         <button type="button" id="togglePassword"
                             class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-primary transition-colors">
                             <svg id="eyeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -222,33 +206,44 @@
                     </div>
                 </div>
 
-                {{-- Remember --}}
-                <div class="flex items-center justify-between">
-                    <label class="flex items-center gap-2 cursor-pointer select-none">
-                        <input type="checkbox" id="remember" name="remember"
-                            class="w-4 h-4 rounded border-gray-300 accent-primary">
-                        <span class="text-sm text-gray-600">Ingat saya</span>
+                {{-- Password confirmation --}}
+                <div>
+                    <label for="password_confirmation" class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">
+                        Konfirmasi Kata Sandi <span class="text-red-500">*</span>
                     </label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                        </span>
+                        <input type="password" id="password_confirmation" name="password_confirmation"
+                            placeholder="Ulangi kata sandi" required
+                            class="w-full pl-10 pr-4 py-3 border-2 border-gray-200 bg-gray-50 hover:border-gray-300 focus:bg-white
+                                rounded-xl text-sm text-gray-800 placeholder-gray-400
+                                focus:ring-0 focus:border-primary transition-colors duration-200">
+                    </div>
                 </div>
 
                 {{-- Submit --}}
-                <button id="btnLogin" type="submit"
+                <button id="btnRegister" type="submit"
                     class="w-full py-3.5 px-4 rounded-xl font-bold text-sm text-white shadow-lg
                         active:scale-[0.98] transition-all duration-200
                         flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                     style="background: linear-gradient(135deg, #30318B 0%, #4a1a8a 100%);
                            box-shadow: 0 4px 20px rgba(48,49,139,0.45);">
-                    <svg id="btnLoginIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg id="btnRegisterIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                            d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
                     </svg>
-                    <span id="btnLoginText">Masuk Sekarang</span>
+                    <span id="btnRegisterText">Daftar Sekarang</span>
                 </button>
             </form>
 
             <p class="text-center text-sm text-gray-500 mt-6">
-                Belum punya akun?
-                <a href="{{ route('register') }}" class="font-semibold text-primary hover:underline">Daftar di sini</a>
+                Sudah punya akun?
+                <a href="{{ route('login') }}" class="font-semibold text-primary hover:underline">Masuk di sini</a>
             </p>
 
             <p class="text-center text-xs text-gray-400 mt-2">
@@ -258,11 +253,10 @@
     </div>
 
     <script>
-        // Login button loading state
-        document.querySelector('form[action="{{ route('login') }}"]').addEventListener('submit', function () {
-            const btn  = document.getElementById('btnLogin');
-            const icon = document.getElementById('btnLoginIcon');
-            const text = document.getElementById('btnLoginText');
+        document.getElementById('formRegister').addEventListener('submit', function () {
+            const btn  = document.getElementById('btnRegister');
+            const icon = document.getElementById('btnRegisterIcon');
+            const text = document.getElementById('btnRegisterText');
 
             btn.disabled = true;
             text.textContent = 'Memproses...';
@@ -272,7 +266,6 @@
             icon.classList.add('animate-spin');
         });
 
-        // Toggle password
         document.getElementById('togglePassword').addEventListener('click', function () {
             const input = document.getElementById('password');
             const icon  = document.getElementById('eyeIcon');

@@ -65,6 +65,32 @@ class UserController extends Controller
             ->with('success', "User {$user->name} berhasil diperbarui.");
     }
 
+    public function approve(User $user)
+    {
+        if ($user->id === auth()->id()) {
+            return redirect()->route('manajer.user.index')
+                ->with('error', 'Tidak dapat menyetujui akun Anda sendiri.');
+        }
+
+        $user->update(['account_status' => 'approved']);
+
+        return redirect()->route('manajer.user.index')
+            ->with('success', "Akun {$user->name} berhasil disetujui.");
+    }
+
+    public function reject(User $user)
+    {
+        if ($user->id === auth()->id()) {
+            return redirect()->route('manajer.user.index')
+                ->with('error', 'Tidak dapat menolak akun Anda sendiri.');
+        }
+
+        $user->update(['account_status' => 'rejected']);
+
+        return redirect()->route('manajer.user.index')
+            ->with('success', "Akun {$user->name} telah ditolak.");
+    }
+
     public function destroy(User $user)
     {
         if ($user->id === auth()->id()) {

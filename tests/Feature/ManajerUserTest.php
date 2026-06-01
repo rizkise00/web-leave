@@ -14,23 +14,28 @@ class ManajerUserTest extends TestCase
     private function makeManajer(): User
     {
         return User::create([
-            'name'      => 'Manajer Test',
-            'email'     => 'manajer@test.com',
-            'password'  => Hash::make('password'),
-            'role'      => 'manajer',
-            'sisa_cuti' => 0,
+            'name'           => 'Manajer Test',
+            'email'          => 'manajer@test.com',
+            'password'       => Hash::make('password'),
+            'role'           => 'manajer',
+            'sisa_cuti'      => 0,
+            'account_status' => 'approved',
         ]);
     }
 
-    private function makeUser(): User
+    private function makeUser(array $overrides = []): User
     {
-        return User::create([
-            'name'      => 'User Test',
-            'email'     => 'user@test.com',
-            'password'  => Hash::make('password'),
-            'role'      => 'user',
-            'sisa_cuti' => 12,
-        ]);
+        static $seq = 0;
+        $seq++;
+
+        return User::create(array_merge([
+            'name'           => "User Test {$seq}",
+            'email'          => "user{$seq}@test.com",
+            'password'       => Hash::make('password'),
+            'role'           => 'user',
+            'sisa_cuti'      => 12,
+            'account_status' => 'approved',
+        ], $overrides));
     }
 
     // ── Index ──────────────────────────────────────────────────────
@@ -48,6 +53,24 @@ class ManajerUserTest extends TestCase
         $this->actingAs($manajer)->get('/manajer/user')
             ->assertSee($user->name)
             ->assertSee($user->email);
+    }
+
+    public function test_halaman_kelola_user_menampilkan_badge_status_akun(): void
+    {
+        $manajer = $this->makeManajer();
+        $this->makeUser(['account_status' => 'pending', 'email' => 'pending@test.com']);
+
+        $this->actingAs($manajer)->get('/manajer/user')
+            ->assertSee('Menunggu');
+    }
+
+    public function test_halaman_kelola_user_menampilkan_banner_jika_ada_pending(): void
+    {
+        $manajer = $this->makeManajer();
+        $this->makeUser(['account_status' => 'pending', 'email' => 'pending@test.com']);
+
+        $this->actingAs($manajer)->get('/manajer/user')
+            ->assertSee('menunggu persetujuan');
     }
 
     // ── Create ─────────────────────────────────────────────────────
@@ -87,14 +110,14 @@ class ManajerUserTest extends TestCase
     public function test_gagal_tambah_user_dengan_email_duplikat(): void
     {
         $manajer = $this->makeManajer();
-        $this->makeUser();
+        $user    = $this->makeUser();
 
         $this->actingAs($manajer)->post('/manajer/user', [
-            'name'     => 'Duplikat',
-            'email'    => 'user@test.com',
-            'role'     => 'user',
-            'sisa_cuti'=> 12,
-            'password' => 'password123',
+            'name'      => 'Duplikat',
+            'email'     => $user->email,
+            'role'      => 'user',
+            'sisa_cuti' => 12,
+            'password'  => 'password123',
         ])->assertSessionHasErrors('email');
     }
 
@@ -151,9 +174,9 @@ class ManajerUserTest extends TestCase
 
     public function test_update_tanpa_password_tidak_mengubah_password(): void
     {
-        $manajer      = $this->makeManajer();
-        $user         = $this->makeUser();
-        $oldPassword  = $user->password;
+        $manajer     = $this->makeManajer();
+        $user        = $this->makeUser();
+        $oldPassword = $user->password;
 
         $this->actingAs($manajer)->put("/manajer/user/{$user->id}", [
             'name'      => $user->name,
@@ -188,6 +211,139 @@ class ManajerUserTest extends TestCase
         $this->assertDatabaseHas('users', ['id' => $manajer->id]);
     }
 
+    // ── Approve ────────────────────────────────────────────────────
+    public function test_manajer_dapat_approve_akun_pending(): void
+    {
+        $manajer = $this->makeManajer();
+        $user    = $this->makeUser(['account_status' => 'pending']);
+
+        $this->actingAs($manajer)
+            ->post("/manajer/user/{$user->id}/approve")
+            ->assertRedirect('/manajer/user');
+
+        $this->assertDatabaseHas('users', [
+            'id'             => $user->id,
+            'account_status' => 'approved',
+        ]);
+    }
+
+    public function test_approve_menampilkan_pesan_sukses(): void
+    {
+        $manajer = $this->makeManajer();
+        $user    = $this->makeUser(['account_status' => 'pending']);
+
+        $this->actingAs($manajer)
+            ->post("/manajer/user/{$user->id}/approve")
+            ->assertSessionHas('success');
+    }
+
+    public function test_manajer_tidak_dapat_approve_dirinya_sendiri(): void
+    {
+        $manajer = $this->makeManajer();
+
+        $this->actingAs($manajer)
+            ->post("/manajer/user/{$manajer->id}/approve")
+            ->assertRedirect('/manajer/user')
+            ->assertSessionHas('error');
+
+        // Status manajer tidak berubah (tetap approved)
+        $this->assertDatabaseHas('users', [
+            'id'             => $manajer->id,
+            'account_status' => 'approved',
+        ]);
+    }
+
+    public function test_user_yang_diapprove_dapat_login(): void
+    {
+        $manajer = $this->makeManajer();
+        $user    = $this->makeUser(['account_status' => 'pending', 'email' => 'pending@test.com']);
+
+        // Approve via manajer, kemudian logout
+        $this->actingAs($manajer)->post("/manajer/user/{$user->id}/approve");
+        $this->post('/logout');
+        $this->assertGuest();
+
+        // User sekarang bisa login
+        $this->post('/login', ['email' => 'pending@test.com', 'password' => 'password'])
+            ->assertRedirect('/dashboard');
+
+        $this->assertAuthenticated();
+    }
+
+    // ── Reject ─────────────────────────────────────────────────────
+    public function test_manajer_dapat_reject_akun_pending(): void
+    {
+        $manajer = $this->makeManajer();
+        $user    = $this->makeUser(['account_status' => 'pending']);
+
+        $this->actingAs($manajer)
+            ->post("/manajer/user/{$user->id}/reject")
+            ->assertRedirect('/manajer/user');
+
+        $this->assertDatabaseHas('users', [
+            'id'             => $user->id,
+            'account_status' => 'rejected',
+        ]);
+    }
+
+    public function test_reject_menampilkan_pesan_sukses(): void
+    {
+        $manajer = $this->makeManajer();
+        $user    = $this->makeUser(['account_status' => 'pending']);
+
+        $this->actingAs($manajer)
+            ->post("/manajer/user/{$user->id}/reject")
+            ->assertSessionHas('success');
+    }
+
+    public function test_manajer_tidak_dapat_reject_dirinya_sendiri(): void
+    {
+        $manajer = $this->makeManajer();
+
+        $this->actingAs($manajer)
+            ->post("/manajer/user/{$manajer->id}/reject")
+            ->assertRedirect('/manajer/user')
+            ->assertSessionHas('error');
+
+        $this->assertDatabaseMissing('users', [
+            'id'             => $manajer->id,
+            'account_status' => 'rejected',
+        ]);
+    }
+
+    public function test_user_yang_direject_tidak_dapat_login(): void
+    {
+        $manajer = $this->makeManajer();
+        $user    = $this->makeUser(['account_status' => 'pending', 'email' => 'pending@test.com']);
+
+        // Reject via manajer, kemudian logout
+        $this->actingAs($manajer)->post("/manajer/user/{$user->id}/reject");
+        $this->post('/logout');
+        $this->assertGuest();
+
+        // User tidak bisa login
+        $this->post('/login', ['email' => 'pending@test.com', 'password' => 'password'])
+            ->assertRedirect('/login')
+            ->assertSessionHas('account_status_error');
+
+        $this->assertGuest();
+    }
+
+    public function test_approve_akun_yang_sudah_approved_tetap_approved(): void
+    {
+        $manajer = $this->makeManajer();
+        $user    = $this->makeUser(['account_status' => 'approved']);
+
+        $this->actingAs($manajer)
+            ->post("/manajer/user/{$user->id}/approve")
+            ->assertRedirect('/manajer/user');
+
+        $this->assertDatabaseHas('users', [
+            'id'             => $user->id,
+            'account_status' => 'approved',
+        ]);
+    }
+
     // ── Proteksi ───────────────────────────────────────────────────
     public function test_user_biasa_tidak_dapat_akses_kelola_user(): void
     {
@@ -198,12 +354,45 @@ class ManajerUserTest extends TestCase
     public function test_user_biasa_tidak_dapat_hapus_user_lain(): void
     {
         $user1 = $this->makeUser();
-        $user2 = User::create([
-            'name' => 'User 2', 'email' => 'u2@test.com',
-            'password' => Hash::make('password'), 'role' => 'user', 'sisa_cuti' => 12,
-        ]);
+        $user2 = $this->makeUser(['email' => 'user2@test.com']);
 
         $this->actingAs($user1)->delete("/manajer/user/{$user2->id}")
             ->assertStatus(403);
+    }
+
+    public function test_user_biasa_tidak_dapat_approve_user(): void
+    {
+        $user    = $this->makeUser();
+        $pending = $this->makeUser(['account_status' => 'pending', 'email' => 'pending@test.com']);
+
+        $this->actingAs($user)
+            ->post("/manajer/user/{$pending->id}/approve")
+            ->assertStatus(403);
+    }
+
+    public function test_user_biasa_tidak_dapat_reject_user(): void
+    {
+        $user    = $this->makeUser();
+        $pending = $this->makeUser(['account_status' => 'pending', 'email' => 'pending@test.com']);
+
+        $this->actingAs($user)
+            ->post("/manajer/user/{$pending->id}/reject")
+            ->assertStatus(403);
+    }
+
+    public function test_tamu_tidak_dapat_approve_user(): void
+    {
+        $user = $this->makeUser(['account_status' => 'pending', 'email' => 'pending@test.com']);
+
+        $this->post("/manajer/user/{$user->id}/approve")
+            ->assertRedirect('/login');
+    }
+
+    public function test_tamu_tidak_dapat_reject_user(): void
+    {
+        $user = $this->makeUser(['account_status' => 'pending', 'email' => 'pending@test.com']);
+
+        $this->post("/manajer/user/{$user->id}/reject")
+            ->assertRedirect('/login');
     }
 }

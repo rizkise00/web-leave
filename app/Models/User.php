@@ -16,6 +16,7 @@ class User extends Authenticatable
         'password',
         'role',
         'sisa_cuti',
+        'account_status',
     ];
 
     protected $hidden = [
@@ -27,7 +28,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password'          => 'hashed',
         ];
     }
 
@@ -49,5 +50,20 @@ class User extends Authenticatable
     public function isUser(): bool
     {
         return $this->role === 'user';
+    }
+
+    public function isApproved(): bool
+    {
+        return $this->account_status === 'approved';
+    }
+
+    public function isPending(): bool
+    {
+        return $this->account_status === 'pending';
+    }
+
+    public function isRejected(): bool
+    {
+        return $this->account_status === 'rejected';
     }
 }

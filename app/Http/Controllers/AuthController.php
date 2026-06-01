@@ -26,6 +26,26 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
+            $user = Auth::user();
+
+            if ($user->isPending()) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return redirect()->route('login')
+                    ->with('account_status_error', 'Akun Anda sedang menunggu persetujuan manajer. Silakan coba lagi setelah disetujui.');
+            }
+
+            if ($user->isRejected()) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return redirect()->route('login')
+                    ->with('account_status_error', 'Pendaftaran akun Anda telah ditolak. Hubungi manajer untuk informasi lebih lanjut.');
+            }
+
             return redirect()->route('dashboard')->with('login_success', true);
         }
 
