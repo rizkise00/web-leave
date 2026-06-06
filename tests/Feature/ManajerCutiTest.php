@@ -91,17 +91,6 @@ class ManajerCutiTest extends TestCase
         $this->assertEquals(10, $user->fresh()->sisa_cuti);
     }
 
-    public function test_approve_cuti_sakit_tidak_mengurangi_sisa_cuti(): void
-    {
-        $manajer = $this->makeManajer();
-        $user    = $this->makeUser();
-        $cuti    = $this->makeCuti($user, ['jenis_cuti' => 'sakit', 'jumlah_hari' => 3]);
-
-        $this->actingAs($manajer)->post("/manajer/cuti/{$cuti->id}/approve");
-
-        $this->assertEquals(12, $user->fresh()->sisa_cuti);
-    }
-
     public function test_tidak_dapat_approve_cuti_yang_sudah_disetujui(): void
     {
         $manajer = $this->makeManajer();

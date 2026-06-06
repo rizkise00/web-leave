@@ -55,12 +55,18 @@
                 background-size: 36px 36px;"></div>
 
     {{-- Main container --}}
-    <div class="relative z-10 w-full max-w-4xl flex rounded-3xl shadow-2xl overflow-hidden" style="min-height:520px;">
+    <div class="relative z-10 w-full max-w-4xl flex rounded-3xl shadow-2xl overflow-hidden">
 
         {{-- Left panel - branding --}}
-        <div class="hidden lg:flex flex-col justify-between w-5/12 p-10 relative overflow-hidden"
-             style="background: linear-gradient(160deg, rgba(48,49,139,0.85) 0%, rgba(74,26,138,0.75) 100%);
-                    backdrop-filter: blur(12px);">
+        <div class="hidden lg:flex flex-col justify-between w-1/2 p-10 relative"
+             style="background-image: url('{{ asset('assets/background.jpeg') }}');
+                    background-size: cover;
+                    background-position: center;
+                    background-repeat: no-repeat;
+                    background-color: #1a1b6b;">
+
+            {{-- Overlay --}}
+            <div class="absolute inset-0" style="background: rgba(10, 10, 60, 0.55);"></div>
 
             {{-- Decorative ring --}}
             <div class="absolute -bottom-20 -left-20 w-72 h-72 rounded-full border-2 border-white/10"></div>
@@ -68,37 +74,32 @@
             <div class="absolute top-20 -right-16 w-56 h-56 rounded-full border border-white/10"></div>
 
             {{-- Brand --}}
-            <div>
-                <div class="w-14 h-14 bg-accent rounded-2xl flex items-center justify-center shadow-lg mb-6">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                </div>
+            <div class="relative z-10">
+                <img src="{{ asset('assets/logo.png') }}" alt="Web Cuti" class="h-14 w-auto mb-6">
                 <h1 class="text-3xl font-extrabold text-white leading-tight">Web Cuti</h1>
-                <p class="text-accent font-semibold mt-1 text-sm">Sistem Manajemen Cuti</p>
+                <p class="text-accent font-bold mt-1 text-sm">Sistem Manajemen Cuti</p>
             </div>
 
             {{-- Features list --}}
-            <div class="space-y-4">
+            <div class="relative z-10 space-y-4">
                 @foreach([
                     ['icon'=>'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2', 'text'=>'Pengajuan cuti mudah & cepat'],
                     ['icon'=>'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', 'text'=>'Persetujuan real-time'],
                     ['icon'=>'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', 'text'=>'Laporan & statistik lengkap'],
                 ] as $item)
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
+                        <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center flex-shrink-0">
                             <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $item['icon'] }}"/>
                             </svg>
                         </div>
-                        <p class="text-white/80 text-sm">{{ $item['text'] }}</p>
+                        <p class="text-white text-sm">{{ $item['text'] }}</p>
                     </div>
                 @endforeach
             </div>
 
             {{-- Footer --}}
-            <p class="text-white/40 text-xs">&copy; {{ date('Y') }} Web Cuti. All rights reserved.</p>
+            <p class="relative z-10 text-white text-xs">&copy; {{ date('Y') }} Web Cuti. All rights reserved.</p>
         </div>
 
         {{-- Right panel - form --}}
@@ -106,12 +107,7 @@
 
             {{-- Mobile brand (only on small screens) --}}
             <div class="lg:hidden text-center mb-8">
-                <div class="inline-flex items-center justify-center w-14 h-14 bg-accent rounded-2xl shadow-lg mb-3">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                </div>
+                <img src="{{ asset('assets/logo.png') }}" alt="Web Cuti" class="h-14 w-auto mx-auto mb-3">
                 <h1 class="text-2xl font-extrabold text-primary">Web Cuti</h1>
             </div>
 
@@ -251,7 +247,7 @@
                 <a href="{{ route('register') }}" class="font-semibold text-primary hover:underline">Daftar di sini</a>
             </p>
 
-            <p class="text-center text-xs text-gray-400 mt-2">
+            <p class="text-center text-xs text-white mt-2">
                 &copy; {{ date('Y') }} Web Cuti &mdash; Sistem Manajemen Cuti Karyawan
             </p>
         </div>

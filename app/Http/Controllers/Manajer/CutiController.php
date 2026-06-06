@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Manajer;
 
 use App\Http\Controllers\Controller;
+use App\Mail\CutiDiproses;
 use App\Models\Cuti;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class CutiController extends Controller
 {
@@ -34,10 +36,10 @@ class CutiController extends Controller
             'disetujui_at'   => now(),
         ]);
 
-        // Kurangi sisa_cuti user hanya untuk cuti tahunan
-        if ($cuti->jenis_cuti === 'tahunan') {
-            $cuti->user->decrement('sisa_cuti', $cuti->jumlah_hari);
-        }
+        $cuti->user->decrement('sisa_cuti', $cuti->jumlah_hari);
+
+        // Kirim notifikasi email ke user
+        Mail::to($cuti->user->email)->send(new CutiDiproses($cuti->load('user')));
 
         return back()->with('success', "Cuti {$cuti->user->name} berhasil disetujui.");
     }
@@ -58,6 +60,9 @@ class CutiController extends Controller
             'disetujui_oleh'  => Auth::id(),
             'disetujui_at'    => now(),
         ]);
+
+        // Kirim notifikasi email ke user
+        Mail::to($cuti->user->email)->send(new CutiDiproses($cuti->load('user')));
 
         return back()->with('success', "Cuti {$cuti->user->name} berhasil ditolak.");
     }

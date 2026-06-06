@@ -46,23 +46,7 @@
         <form action="{{ route('user.cuti.store') }}" method="POST" class="space-y-5">
             @csrf
 
-            {{-- Jenis Cuti --}}
-            <div>
-                <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">
-                    Jenis Cuti <span class="text-red-500">*</span>
-                </label>
-                <select name="jenis_cuti" required
-                    class="w-full px-4 py-3 border-2 border-gray-200 bg-gray-50 rounded-xl text-sm text-gray-800
-                        focus:outline-none focus:border-primary focus:bg-white transition-colors
-                        {{ $errors->has('jenis_cuti') ? 'border-red-400' : '' }}">
-                    <option value="" disabled selected>Pilih jenis cuti...</option>
-                    @foreach(\App\Models\Cuti::JENIS_LABEL as $value => $label)
-                        <option value="{{ $value }}" {{ old('jenis_cuti') === $value ? 'selected' : '' }}>
-                            {{ $label }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+            <input type="hidden" name="jenis_cuti" value="tahunan">
 
             {{-- Tanggal --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

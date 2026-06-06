@@ -200,9 +200,13 @@
             cancelButtonColor: '#e5e7eb',
             confirmButtonText: 'Ya, Setujui',
             cancelButtonText: 'Batal',
-            customClass: { cancelButton: '!text-gray-700' }
-        }).then(result => {
-            if (result.isConfirmed) form.submit();
+            customClass: { cancelButton: '!text-gray-700' },
+            showLoaderOnConfirm: true,
+            allowOutsideClick: () => !Swal.isLoading(),
+            preConfirm: () => {
+                form.submit();
+                return new Promise(() => {});
+            },
         });
     }
 
@@ -219,12 +223,14 @@
             confirmButtonText: 'Ya, Tolak',
             cancelButtonText: 'Batal',
             customClass: { cancelButton: '!text-gray-700' },
-            preConfirm: () => document.getElementById('catatanSwal').value,
-        }).then(result => {
-            if (result.isConfirmed) {
-                document.getElementById('catatanInput' + id).value = result.value || '';
+            showLoaderOnConfirm: true,
+            allowOutsideClick: () => !Swal.isLoading(),
+            preConfirm: () => {
+                document.getElementById('catatanInput' + id).value =
+                    document.getElementById('catatanSwal').value || '';
                 document.getElementById('rejectForm' + id).submit();
-            }
+                return new Promise(() => {});
+            },
         });
     }
 

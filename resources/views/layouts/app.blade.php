@@ -17,7 +17,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 font-sans antialiased">
+<body class="font-sans antialiased" style="background-image: url('{{ asset('assets/bg-content.jpg') }}'); background-size: cover; background-position: center; background-attachment: fixed;">
 
     {{-- Navbar --}}
     <nav class="navbar-gradient shadow-lg sticky top-0 z-40">
@@ -26,12 +26,7 @@
 
                 {{-- Brand --}}
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-3 flex-shrink-0">
-                    <div class="w-9 h-9 bg-accent rounded-xl flex items-center justify-center shadow-md">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
-                    </div>
+                    <img src="{{ asset('assets/logo.png') }}" alt="Web Cuti" class="h-9 w-auto">
                     <span class="text-white font-extrabold text-lg tracking-wide">Web Cuti</span>
                 </a>
 

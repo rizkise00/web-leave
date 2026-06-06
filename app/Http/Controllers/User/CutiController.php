@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Mail\CutiDiajukan;
 use App\Models\Cuti;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class CutiController extends Controller
 {
@@ -30,7 +33,6 @@ class CutiController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'jenis_cuti'      => ['required', 'in:tahunan,sakit,keperluan'],
             'tanggal_mulai'   => ['required', 'date', 'after_or_equal:today'],
             'tanggal_selesai' => ['required', 'date', 'after_or_equal:tanggal_mulai'],
             'alasan'          => ['required', 'string', 'max:500'],
@@ -40,13 +42,11 @@ class CutiController extends Controller
         $selesai    = \Carbon\Carbon::parse($data['tanggal_selesai']);
         $jumlahHari = $mulai->diffInDays($selesai) + 1;
 
-        if ($data['jenis_cuti'] === 'tahunan') {
-            $sisa = Auth::user()->sisa_cuti;
-            if ($jumlahHari > $sisa) {
-                return back()->withInput()->withErrors([
-                    'jumlah_hari' => "Kuota tidak cukup. Sisa kuota Anda: {$sisa} hari.",
-                ]);
-            }
+        $sisa = Auth::user()->sisa_cuti;
+        if ($jumlahHari > $sisa) {
+            return back()->withInput()->withErrors([
+                'jumlah_hari' => "Kuota tidak cukup. Sisa kuota Anda: {$sisa} hari.",
+            ]);
         }
 
         if ($this->hasOverlap(Auth::id(), $data['tanggal_mulai'], $data['tanggal_selesai'])) {
@@ -55,14 +55,23 @@ class CutiController extends Controller
             ]);
         }
 
-        Cuti::create([
+        $cuti = Cuti::create([
             'user_id'         => Auth::id(),
-            'jenis_cuti'      => $data['jenis_cuti'],
+            'jenis_cuti'      => 'tahunan',
             'tanggal_mulai'   => $data['tanggal_mulai'],
             'tanggal_selesai' => $data['tanggal_selesai'],
             'jumlah_hari'     => $jumlahHari,
             'alasan'          => $data['alasan'],
         ]);
+
+        // Kirim notifikasi email ke semua manajer yang aktif
+        $managers = User::where('role', 'manajer')
+            ->where('account_status', 'approved')
+            ->get();
+
+        foreach ($managers as $manajer) {
+            Mail::to($manajer->email)->send(new CutiDiajukan($cuti->load('user')));
+        }
 
         return redirect()->route('dashboard')
             ->with('success', 'Pengajuan cuti berhasil dikirim dan menunggu persetujuan.');
@@ -75,7 +84,6 @@ class CutiController extends Controller
         }
 
         $data = $request->validate([
-            'jenis_cuti'      => ['required', 'in:tahunan,sakit,keperluan'],
             'tanggal_mulai'   => ['required', 'date', 'after_or_equal:today'],
             'tanggal_selesai' => ['required', 'date', 'after_or_equal:tanggal_mulai'],
             'alasan'          => ['required', 'string', 'max:500'],
@@ -85,13 +93,11 @@ class CutiController extends Controller
         $selesai    = \Carbon\Carbon::parse($data['tanggal_selesai']);
         $jumlahHari = $mulai->diffInDays($selesai) + 1;
 
-        if ($data['jenis_cuti'] === 'tahunan') {
-            $sisa = Auth::user()->sisa_cuti;
-            if ($jumlahHari > $sisa) {
-                return back()->withInput()->withErrors([
-                    'jumlah_hari' => "Kuota tidak cukup. Sisa kuota Anda: {$sisa} hari.",
-                ]);
-            }
+        $sisa = Auth::user()->sisa_cuti;
+        if ($jumlahHari > $sisa) {
+            return back()->withInput()->withErrors([
+                'jumlah_hari' => "Kuota tidak cukup. Sisa kuota Anda: {$sisa} hari.",
+            ]);
         }
 
         if ($this->hasOverlap(Auth::id(), $data['tanggal_mulai'], $data['tanggal_selesai'], $cuti->id)) {
@@ -101,7 +107,6 @@ class CutiController extends Controller
         }
 
         $cuti->update([
-            'jenis_cuti'      => $data['jenis_cuti'],
             'tanggal_mulai'   => $data['tanggal_mulai'],
             'tanggal_selesai' => $data['tanggal_selesai'],
             'jumlah_hari'     => $jumlahHari,

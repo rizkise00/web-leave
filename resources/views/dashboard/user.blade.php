@@ -135,15 +135,15 @@
                             <td class="px-6 py-4">
                                 @if($cuti->status === 'pending')
                                     <div class="flex items-center gap-2">
-                                        <button type="button"
-                                            onclick="openEditCuti({{ $cuti->id }}, '{{ $cuti->jenis_cuti }}', '{{ $cuti->tanggal_mulai->toDateString() }}', '{{ $cuti->tanggal_selesai->toDateString() }}', @js($cuti->alasan))"
+                                        <!-- <button type="button"
+                                            onclick="openEditCuti({{ $cuti->id }}, '{{ $cuti->tanggal_mulai->toDateString() }}', '{{ $cuti->tanggal_selesai->toDateString() }}', @js($cuti->alasan))"
                                             class="inline-flex items-center gap-1 px-3 py-1.5 bg-primary hover:bg-primary-dark text-white text-xs font-semibold rounded-lg transition-all active:scale-95">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                             </svg>
                                             Edit
-                                        </button>
+                                        </button> -->
                                         <form action="{{ route('user.cuti.cancel', $cuti) }}" method="POST" class="inline">
                                             @csrf
                                             @method('DELETE')
@@ -208,23 +208,7 @@
                     </div>
                 @endif
 
-                {{-- Jenis --}}
-                <div>
-                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">
-                        Jenis Cuti <span class="text-red-500">*</span>
-                    </label>
-                    <select name="jenis_cuti" required
-                        class="w-full px-4 py-2.5 border-2 border-gray-200 bg-gray-50 rounded-xl text-sm text-gray-800
-                            focus:outline-none focus:border-primary focus:bg-white transition-colors
-                            {{ $errors->has('jenis_cuti') ? 'border-red-400' : '' }}">
-                        <option value="" disabled {{ !old('jenis_cuti') ? 'selected' : '' }}>Pilih jenis cuti...</option>
-                        @foreach(\App\Models\Cuti::JENIS_LABEL as $value => $label)
-                            <option value="{{ $value }}" {{ old('jenis_cuti') === $value ? 'selected' : '' }}>
-                                {{ $label }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+                <input type="hidden" name="jenis_cuti" value="tahunan">
 
                 {{-- Tanggal --}}
                 <div class="grid grid-cols-2 gap-3">
@@ -310,15 +294,13 @@
         document.body.style.overflow = 'hidden';
     }
 
-    function openEditCuti(id, jenis, mulai, selesai, alasan) {
+    function openEditCuti(id, mulai, selesai, alasan) {
         const form = document.getElementById('formCuti');
         form.action = `/cuti/${id}`;
         document.getElementById('formMethod').value = 'PUT';
         document.getElementById('modalTitle').textContent = 'Edit Pengajuan Cuti';
         document.getElementById('btnKirimText').textContent = 'Simpan Perubahan';
 
-        // Isi field
-        form.querySelector('[name="jenis_cuti"]').value = jenis;
         document.getElementById('modalTanggalMulai').value = mulai;
         // Enable selesai dulu sebelum set value
         document.getElementById('modalTanggalSelesai').disabled = false;

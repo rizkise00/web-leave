@@ -12,7 +12,7 @@ class UserSeeder extends Seeder
     {
         User::create([
             'name'           => 'Manajer',
-            'email'          => 'manajer@webcuti.com',
+            'email'          => 'rizki.se00@gmail.com',
             'password'       => Hash::make('password'),
             'role'           => 'manajer',
             'account_status' => 'approved',
@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
 
         User::create([
             'name'           => 'User',
-            'email'          => 'user@webcuti.com',
+            'email'          => 'ronnasundari@gmail.com',
             'password'       => Hash::make('password'),
             'role'           => 'user',
             'account_status' => 'approved',

@@ -28,9 +28,7 @@ class Cuti extends Model
     const KUOTA_TAHUNAN = 12;
 
     const JENIS_LABEL = [
-        'tahunan'   => 'Cuti Tahunan',
-        'sakit'     => 'Cuti Sakit',
-        'keperluan' => 'Keperluan Pribadi',
+        'tahunan' => 'Cuti Tahunan',
     ];
 
     const STATUS_LABEL = [

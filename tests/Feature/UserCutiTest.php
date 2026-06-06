@@ -28,7 +28,6 @@ class UserCutiTest extends TestCase
     {
         return Cuti::create(array_merge([
             'user_id'         => $user->id,
-            'jenis_cuti'      => 'tahunan',
             'tanggal_mulai'   => Carbon::tomorrow()->toDateString(),
             'tanggal_selesai' => Carbon::tomorrow()->addDay()->toDateString(),
             'jumlah_hari'     => 2,
@@ -43,7 +42,6 @@ class UserCutiTest extends TestCase
         $user = $this->makeUser();
 
         $this->actingAs($user)->post('/cuti/ajukan', [
-            'jenis_cuti'      => 'tahunan',
             'tanggal_mulai'   => Carbon::tomorrow()->toDateString(),
             'tanggal_selesai' => Carbon::tomorrow()->addDay()->toDateString(),
             'alasan'          => 'Keperluan keluarga',
@@ -56,41 +54,12 @@ class UserCutiTest extends TestCase
         ]);
     }
 
-    public function test_user_dapat_mengajukan_cuti_sakit(): void
-    {
-        $user = $this->makeUser();
-
-        $this->actingAs($user)->post('/cuti/ajukan', [
-            'jenis_cuti'      => 'sakit',
-            'tanggal_mulai'   => Carbon::tomorrow()->toDateString(),
-            'tanggal_selesai' => Carbon::tomorrow()->toDateString(),
-            'alasan'          => 'Demam',
-        ])->assertRedirect('/dashboard');
-
-        $this->assertDatabaseHas('cutis', ['jenis_cuti' => 'sakit', 'status' => 'pending']);
-    }
-
-    public function test_user_dapat_mengajukan_cuti_keperluan(): void
-    {
-        $user = $this->makeUser();
-
-        $this->actingAs($user)->post('/cuti/ajukan', [
-            'jenis_cuti'      => 'keperluan',
-            'tanggal_mulai'   => Carbon::tomorrow()->toDateString(),
-            'tanggal_selesai' => Carbon::tomorrow()->toDateString(),
-            'alasan'          => 'Urusan administrasi',
-        ])->assertRedirect('/dashboard');
-
-        $this->assertDatabaseHas('cutis', ['jenis_cuti' => 'keperluan']);
-    }
-
     // ── Validasi pengajuan ─────────────────────────────────────────
     public function test_gagal_ajukan_cuti_tanpa_alasan(): void
     {
         $user = $this->makeUser();
 
         $this->actingAs($user)->post('/cuti/ajukan', [
-            'jenis_cuti'      => 'tahunan',
             'tanggal_mulai'   => Carbon::tomorrow()->toDateString(),
             'tanggal_selesai' => Carbon::tomorrow()->toDateString(),
             'alasan'          => '',
@@ -102,7 +71,6 @@ class UserCutiTest extends TestCase
         $user = $this->makeUser();
 
         $this->actingAs($user)->post('/cuti/ajukan', [
-            'jenis_cuti'      => 'tahunan',
             'tanggal_mulai'   => Carbon::yesterday()->toDateString(),
             'tanggal_selesai' => Carbon::today()->toDateString(),
             'alasan'          => 'Test',
@@ -114,7 +82,6 @@ class UserCutiTest extends TestCase
         $user = $this->makeUser(sisaCuti: 1);
 
         $this->actingAs($user)->post('/cuti/ajukan', [
-            'jenis_cuti'      => 'tahunan',
             'tanggal_mulai'   => Carbon::tomorrow()->toDateString(),
             'tanggal_selesai' => Carbon::tomorrow()->addDays(4)->toDateString(),
             'alasan'          => 'Test kuota',
@@ -144,7 +111,6 @@ class UserCutiTest extends TestCase
         $newSelesai = Carbon::now()->addDays(6)->toDateString();
 
         $this->actingAs($user)->put("/cuti/{$cuti->id}", [
-            'jenis_cuti'      => 'sakit',
             'tanggal_mulai'   => $newMulai,
             'tanggal_selesai' => $newSelesai,
             'alasan'          => 'Alasan baru',
@@ -152,7 +118,7 @@ class UserCutiTest extends TestCase
 
         $this->assertDatabaseHas('cutis', [
             'id'         => $cuti->id,
-            'jenis_cuti' => 'sakit',
+            'jenis_cuti' => 'tahunan',
             'alasan'     => 'Alasan baru',
         ]);
     }
@@ -229,7 +195,6 @@ class UserCutiTest extends TestCase
         $user = $this->makeUser();
 
         $this->actingAs($user)->post('/cuti/ajukan', [
-            'jenis_cuti'      => 'tahunan',
             'tanggal_mulai'   => Carbon::tomorrow()->toDateString(),
             'tanggal_selesai' => Carbon::tomorrow()->addDays(2)->toDateString(),
             'alasan'          => 'Test',
